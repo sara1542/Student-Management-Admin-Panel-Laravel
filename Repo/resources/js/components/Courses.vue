@@ -32,10 +32,10 @@
                         <tr v-for="course in courses" v-bind:key="course.id">
                                 <th>{{course.id}}</th>
                                 <td><router-link :to="`/CourseStudents/${course.Code}/${course.id}`">{{course.Name}}</router-link></td>
-                                <th>{{course.Code}}</th>
-                                <th>{{course.Level}}</th>
-                                <th>{{course.Program}}</th>
-                                <th>{{course.Description}}</th>
+                                <td>{{course.Code}}</td>
+                                <td>{{course.Level}}</td>
+                                <td>{{course.Program}}</td>
+                                <td>{{course.Description}}</td>
                                 <td> <button class="btn badge-success" @click="editCourse(course)">Edit</button> </td>
                                <td> <button class="btn badge-success" @click="deleteCourse(course.id)">Delete</button> </td>
                                <td> <router-link :to="`/GradeSetup/${course.id}`">Grade Setup</router-link> </td>

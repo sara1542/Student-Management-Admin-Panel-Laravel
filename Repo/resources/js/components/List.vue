@@ -117,34 +117,20 @@
         },
         methods:{
             fetchStudents(page_url){
-                let vm = this; 
                 page_url = page_url || '/api/students';
                 fetch(page_url)
                     .then(res => res.json())
                     .then(res => {
                         this.students = res.data;
-                        vm.makePagination(res.meta, res.links);
                     })
                     .catch(err => console.log(err));
-            },
-            makePagination(meta, links){
-                let pagination = {
-                    current_page:   meta.current_page,
-                    last_page:      meta.last_page,
-                    next_page_url:  links.next,
-                    prev_page_url:  links.prev
-                };
-                this.pagination = pagination;
-            },
-            
+            },    
                 fetchPrograms(page_url) {
-                let vm = this;
                 page_url = page_url || '/api/programs';
                 fetch(page_url)
                     .then((res) => res.json())
                     .then((res) => {
                     this.programs = res.data;
-                   // vm.makePagination(res.meta, res.links);
                     })
                     .catch((err) => console.log(err));
                 },
@@ -222,12 +208,10 @@
                     this.student.Program= student.Program;
             },
             filter(selected,valueToSearch){
-                let vm = this; 
                 fetch(`api/students/${selected}/${valueToSearch}`)
                     .then(res => res.json())
                     .then(res => {
                         this.students = res.data;
-                        vm.makePagination(res.meta, res.links);
                     })
                     .catch(err => console.log(err));
 

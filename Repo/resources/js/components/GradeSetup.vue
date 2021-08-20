@@ -10,7 +10,6 @@
                     <table class="mb-0 table table-bordered">
                         <thead>
                             <tr>
-                                <th> courseID</th>
                                 <th>Name</th>
                                 <th>Max</th>
                                 <th> Description</th>
@@ -18,10 +17,10 @@
                                 <th> Delete</th>
                             </tr>
                             <tr v-for="Item in Items" v-bind:key="Item.Name">
-                                <th>{{ Item.courseID }}</th>
-                                <th>{{ Item.Name }}</th>
-                                <th>{{ Item.Max }}</th>
-                                <th>{{ Item.Description }}</th>
+
+                                <td>{{ Item.Name }}</td>
+                                <td>{{ Item.Max }}</td>
+                                <td>{{ Item.Description }}</td>
                                 <td> <button class="btn badge-success" @click="editItem(Item)">Edit</button> </td>
                                <td> <button class="btn badge-success" @click="deleteItem(Item.courseID,Item.Name)">Delete</button> </td>
                                 

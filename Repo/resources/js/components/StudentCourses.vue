@@ -1,58 +1,40 @@
 <template>
     <div>
+      <form @submit.prevent="saveGrades" class="md-3">
         <h4>Courses That {{studentID}} has Enrolled in</h4>
         <div class="row">
-                <div class="col-lg-6">
-                    <div class="main-card mb-3 card">
+                 <div class="main-card mb-3 card">
                         <div class="card-body">
                             <h5 class="card-title">Courses</h5>
-
                             <table class="mb-0 table table-bordered">
                                 <thead>
                                     <tr>
                                         <th>Name</th>
                                         <th>Code</th>
-                                        <th>Grade</th>
                                     </tr>
                                 </thead>
                                 <tr v-for="course in courses" v-bind:key="course.Name">
-                                        <th>{{course.Name}}</th>
-                                        <th>{{course.Code}}</th>
-                                        <th><button class="btn badge-success"  @click="fetchGrades(course.id)">Show grade </button></th>
-                                </tr>
+                                        <td>{{course.Name}}</td>
+                                        <td>{{course.Code}}</td>
+                                        <template   v-for="grade in grades">
+                              <td class="allbdrCenMid" v-bind:key="grade.id" v-if="grade.courseID === course.id"  >
+                              <th> {{grade.Name}}/ {{grade.Max}}</th> 
+                                <input type="number"  value=""  v-model="grade.Value" class="nobdrCenMid" style="overflow:hidden; " min="0" :max='grade.Max' required>
+                                </td>
+                                </template>
+                                <template>
+                                <th style="text-align: center; vertical-align: middle;">Total: {{ course.totalValue }} / {{course.totalMax}} </th>  
+                                </template>
+                                </tr> 
                             </table>
-                            <div v-show="boolShow">
-                              <table class="mb-0 table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Value</th>
-                                        <th>Max</th>
-                                    </tr>
-                                </thead>
-                                <tr v-for="grade in grades" v-bind:key="grade.Name">
-                                        <th>{{grade.Name}}</th>
-                                          <th>
-                                             <form  @submit.prevent="saveGradeValue(grade)">
-                                            <input type="number" v-model="grade.Value" min="0" :max='grade.Max'>
-                                        <button class ="btn badge-success" type="submit">Save</button>
-                                        </form>
-                                        </th>                                       
-                                        <th>{{grade.Max}}</th>
-                                </tr>
-                                <tr>
-                                  <th>Total</th>
-                                  <th>{{totalValue}}</th>
-                                  <th>{{totalMax}}</th>
-                                </tr>
-                            </table>
-
-                            </div>
+                            
                         </div>
                     </div>
                 </div>
+                <button type="submit" class="btn badge-success" >Save</button>
+                </form>
         </div>
-    </div>
+  
 </template>
 <script>
 export default {
@@ -66,6 +48,8 @@ export default {
         Name: '',
         Code: '',
         Description: '',
+        totalValue:0,
+        totalMax:0,
       },
       grades: [],
       grade: {
@@ -79,15 +63,25 @@ export default {
       grade_id:'',
       totalValue:0,
       totalMax:0,
-      pagination: {},
+      items: [],
+      item: {
+        id:'',
+        courseID: '',
+        Name:'',
+        Description: '',
+        Max: '',
+      },
+      item_id:'',
       boolShow: false,
     };
   },
   created() {
-    this.fetchStudents();
+    this.fetchCourses();
+    this.fetchGrades();
+    this.fetchTotalValues();
   },
   methods: {
-    fetchStudents(page_url) {
+    fetchCourses(page_url) {
       page_url = page_url || '/api/courses/'+this.id;
       fetch(page_url)
         .then((res) => res.json())
@@ -96,35 +90,41 @@ export default {
         })
         .catch((err) => console.log(err));
     },
-    fetchGrades(courseid){
+    fetchGrades(){
           this.totalValue=0;
           this.totalMax=0;
-      this.boolShow = true;
-      fetch(`/api/grades/${this.id}/${courseid}`)
+      fetch(`/api/gradesPerStudent/${this.id}`)
         .then(res => res.json())
         .then(res => {
           this.grades = res.data;
-
-          this.grades.forEach(item=>{
-            for(let g in item){
-              this.totalValue+= item['Value'];
-              this.totalMax+=item['Max'];
-              break;
-            }
-          })
+          this.fetchTotalValues();
         })
         .catch((err) => console.log(err));
 
     },
-    saveGradeValue(grade){
-      console.log('In update');
-       this.grade.grade_id = grade.id;
-                        this.grade.id = grade.id;
-                        this.grade.Name=  grade.Name;
-                        this.grade.Value=  grade.Value;
-                        this.grade.Max=  grade.Max;
-                            this.grade.studentID=  grade.studentID;
-                        this.grade.courseID= grade.courseID;
+    fetchTotalValues(){
+      var sum1=0,sum2=0,i=0;
+        this.courses.forEach(course=>{
+            sum1=0,sum2=0;
+             this.grades.forEach(grade=>{
+             if(course.id==grade.courseID){
+               sum1+=grade.Value;
+               sum2+=grade.Max;
+             }   
+          }) 
+          course.totalValue=sum1;
+          course.totalMax=sum2;
+          })     
+    },
+     saveGrades(){
+  this.grades.forEach(item=>{
+             this.grade.grade_id = item['id'];
+                        this.grade.id =item['id'];
+                        this.grade.Name=  item['Name'];
+                        this.grade.Value= item['Value'];
+                        this.grade.Max= item['Max'];
+                            this.grade.studentID=  item['studentID'];
+                        this.grade.courseID= item['courseID'];
                             //Update
                             fetch('/api/grade',{
                                 method:     'put',
@@ -142,12 +142,10 @@ export default {
                             this.grade.Name=  '';
                             this.grade.Max=  '';
                             this.grade.Value=  '';
-                              this.totalValue=0;
-                              this.totalMax=0;
-                                    this.fetchGrades();
                                 })
                                 .catch(err => console.log(err));
-
+          })
+      this.fetchGrades();         
     }
   },
 };

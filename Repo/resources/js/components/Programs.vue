@@ -14,13 +14,15 @@
                                 <th>Name</th>
                                 <th>Description</th>
                                 <th> Courses</th>
+                                   <th>Update</th>
+                                <th>Delete</th>
                             </tr>
                         </thead>
                         <tr>
                         <tr v-for="program in programs" v-bind:key="program.id">
                                 <th>{{program.id}}</th>
-                                <th>{{program.Name}}</th>
-                                <th>{{program.Description}}</th> 
+                                <td>{{program.Name}}</td>
+                                <td>{{program.Description}}</td> 
                                 <td><router-link :to="`/ProgramCourses/${program.Name}`">Go to {{program.Name}} Courses =></router-link></td>
                                 <td> <button class="btn badge-success" @click="editProgram(program)">Edit</button> </td>
                                <td> <button class="btn badge-success" @click="deleteProgram(program.id)">Delete</button> </td>
@@ -65,13 +67,11 @@
         },
         methods:{
             fetchPrograms(page_url) {
-                let vm = this;
                 page_url = page_url || '/api/programs';
                 fetch(page_url)
                     .then((res) => res.json())
                     .then((res) => {
                     this.programs = res.data;
-                   // vm.makePagination(res.meta, res.links);
                     })
                     .catch((err) => console.log(err));
                 },
@@ -129,8 +129,6 @@
                                 })
                                 .catch(err => console.log(err));
                         }
-                        
-                        
                     },
             editProgram(program){
                         this.editprogram = true;
